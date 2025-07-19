@@ -20,7 +20,7 @@ namespace CustomerApi.Controllers
 
         // POST: api/customers
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PostCustomer(Customer customer)
         {
             // Validate that CustomerNumber is unique
@@ -37,7 +37,7 @@ namespace CustomerApi.Controllers
 
         // GET: api/customers/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
@@ -56,7 +56,7 @@ namespace CustomerApi.Controllers
 
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PutCustomer(int id, Customer updatedCustomer)
         {
             var customer = await _context.Customers.FindAsync(id);
@@ -77,7 +77,7 @@ namespace CustomerApi.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
             var customer = await _context.Customers.FindAsync(id);
