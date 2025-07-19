@@ -14,30 +14,37 @@ namespace CustomerApi.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody] LoginModel login)
         {
-            if (login.Username == "admin" && login.Password == "password")
+            if (!((login.Username.ToLower() == "admin" && login.Password == "password") || (login.Username.ToLower() == "user" && login.Password == "password")))
+                return Unauthorized();
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("SDDFE4W34GTDE54S#$%tg4ERSV@#$reFRE45RGRED"); // Use a secure key
+            //var role = "Admin"; // or "User" depending on login, for demo assume Admin
+            var role = login.Username.ToLower(); 
+
+            var claims = new List<Claim>
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes("SDDFE4W34GTDE54S#$%tg4ERSV@#$reFRE45RGRED"); // Use a secure key
+                new Claim(ClaimTypes.Name, login.Username),
+                new Claim(ClaimTypes.Role, role)
+            };
 
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[] {
-                        new Claim(ClaimTypes.Name, login.Username)
-                    }),
-                    Expires = DateTime.UtcNow.AddHours(1),
-                    SigningCredentials = new SigningCredentials(
-                        new SymmetricSecurityKey(key),
-                        SecurityAlgorithms.HmacSha256Signature
-                    )
-                };
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                //Subject = new ClaimsIdentity(new[] {
+                //    new Claim(ClaimTypes.Name, login.Username)
+                //}),
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature
+                )
+            };
 
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                var tokenString = tokenHandler.WriteToken(token);
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
 
-                return Ok(new { Token = tokenString });
-            }
-
-            return Unauthorized();
+            return Ok(new { Token = tokenString });
         }
     }
 }
